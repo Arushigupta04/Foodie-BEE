@@ -46,13 +46,19 @@ export const CartProvider = ({ children }) => {
   };
 
   const decreaseItemQuantity = (itemId) => {
-    const updatedCart = cartItems.map((item) =>
-      item._id === itemId && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item
-    );
-    setCartItems(updatedCart);
-    toast.info('Item quantity decreased'); // Show toast for decreasing quantity
+    const itemToDecrease = cartItems.find((item) => item._id === itemId);
+  
+    if (itemToDecrease.quantity > 1) {
+      const updatedCart = cartItems.map((item) =>
+        item._id === itemId ? { ...item, quantity: item.quantity - 1 } : item
+      );
+      setCartItems(updatedCart);
+      toast.info('Item quantity decreased'); // Show toast for decreasing quantity
+    } else {
+      toast.warning('Item quantity cannot be reduced further'); // Show toast when quantity is 1
+    }
   };
-
+  
   const clearCart = () => {
     setCartItems([]);
     toast.success('Cart cleared'); // Show toast for clearing cart
