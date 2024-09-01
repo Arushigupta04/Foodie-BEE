@@ -5,7 +5,6 @@ import { CartContext } from '../Cart/CartContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// const serverURL = "http://192.168.54.63:5000"
 const serverURL = "http://localhost:5000";
 
 function UserProfile() {
@@ -90,56 +89,52 @@ function UserProfile() {
       if (response.ok) {
         const updatedUserData = await response.json();
         if (updatedUserData && updatedUserData.user) {
-          toast.success('User information updated successfully');
           setEditMode(false);
           setUser(updatedUserData.user);
         } else {
-          toast.error('Failed to get updated user data');
+          console.error('Failed to get updated user data');
         }
       } else {
-        toast.error('Failed to update user information');
+        console.error('Failed to update user information');
       }
     } catch (error) {
       console.error('Error updating user information:', error);
-      toast.error('Error updating user information');
     }
   };
 
-  const handleDeleteAccount = async () => {
-    try {
-      const token = cookies.token;
-      if (!token) {
-        console.error('Token not found in cookies');
-        return;
-      }
+  const handleDeleteAccount = () => {
+    toast.info('Are you sure you want to delete your account? This action cannot be undone.', {
+      autoClose: false,
+      closeButton: true,
+      onClose: async () => {
+        try {
+          const token = cookies.token;
+          if (!token) {
+            console.error('Token not found in cookies');
+            return;
+          }
 
-      const confirmed = window.confirm(
-        'Are you sure you want to delete your account? This action cannot be undone.'
-      );
+          const response = await fetch(`${serverURL}/api/user/delete`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-      if (confirmed) {
-        const response = await fetch(`${serverURL}/api/user/delete`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          toast.success('User account deleted successfully');
-          removeCookie('token');
-          removeCookie('cartItems', { path: '/' });
-          clearCart();
-          window.location.href = '/sign-up';
-        } else {
-          toast.error('Failed to delete user account');
+          if (response.ok) {
+            removeCookie('token');
+            removeCookie('cartItems', { path: '/' });
+            clearCart();
+            window.location.href = '/sign-up';
+          } else {
+            console.error('Failed to delete user account');
+          }
+        } catch (error) {
+          console.error('Error deleting user account:', error);
         }
       }
-    } catch (error) {
-      console.error('Error deleting user account:', error);
-      toast.error('Error deleting user account');
-    }
+    });
   };
 
   const handleInputChange = (e) => {
@@ -161,6 +156,7 @@ function UserProfile() {
 
   return (
     <div className="card user-card-full col-xl-8" style={{ margin: '40px auto' }}>
+      <ToastContainer />
       <div className="row m-l-0 m-r-0">
         <div className="col-sm-4 bg-c-lite-green user-profile">
           <div className="card-block text-center text-white">
@@ -235,7 +231,11 @@ function UserProfile() {
                 <div className="card mb-3" key={index}>
                   <div className="row no-gutters">
                     <div className="col-md-4" style={{ alignSelf: "center" }}>
-                      <img src={order.image} className="card-img" alt="Product" />
+                      {order.image ? (
+                        <img src={order.image} className="card-img" alt="Product" />
+                      ) : (
+                        <p>No Image Available</p>
+                      )}
                     </div>
                     <div className="col-md-8">
                       <div className="card-body">
@@ -246,19 +246,15 @@ function UserProfile() {
                         </div>
                         <div className="text-container">
                           <h6>Address:</h6>
-                          <p>&nbsp;&nbsp;{order.delivery_address}</p>
+                          <p>&nbsp;&nbsp;{order.address}</p>
                         </div>
                         <div className="text-container">
-                          <h6>Quantity:</h6>
-                          <p>&nbsp;&nbsp;{order.quantity}</p>
+                          <h6>Ordered At:</h6>
+                          <p>&nbsp;&nbsp;{order.createdAt}</p>
                         </div>
                         <div className="text-container">
-                          <h6>Total Price:</h6>
-                          <p>&nbsp;&nbsp;₹{order.price * order.quantity}</p>
-                        </div>
-                        <div className="text-container">
-                          <h6>Order ID:</h6>
-                          <p>&nbsp;&nbsp;{order._id}</p>
+                          <h6>Status:</h6>
+                          <p>&nbsp;&nbsp;{order.status}</p>
                         </div>
                       </div>
                     </div>
@@ -269,7 +265,6 @@ function UserProfile() {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 }
