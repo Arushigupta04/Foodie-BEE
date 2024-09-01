@@ -89,13 +89,12 @@ function UserProfile() {
       if (response.ok) {
         const updatedUserData = await response.json();
         if (updatedUserData && updatedUserData.user) {
+          toast.success('User information updated successfully', { toastId: 'update-success' });
           setEditMode(false);
-  
+          setUser(updatedUserData.user);
+          fetchUserData();
           // Preserve the RecentOrders in the updated user data
-          setUser({
-            ...updatedUserData.user,
-            RecentOrders: user.RecentOrders, // Keep the existing RecentOrders
-          });
+        
         } else {
           console.error('Failed to get updated user data');
         }
@@ -162,7 +161,7 @@ function UserProfile() {
 
   return (
     <div className="card user-card-full col-xl-8" style={{ margin: '40px auto' }}>
-      <ToastContainer />
+
       <div className="row m-l-0 m-r-0">
         <div className="col-sm-4 bg-c-lite-green user-profile">
           <div className="card-block text-center text-white">
