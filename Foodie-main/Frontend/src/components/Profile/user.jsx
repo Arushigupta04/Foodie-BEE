@@ -76,7 +76,7 @@ function UserProfile() {
         console.error('Token not found in cookies');
         return;
       }
-
+  
       const response = await fetch(`${serverURL}/api/user/update`, {
         method: 'POST',
         headers: {
@@ -85,12 +85,17 @@ function UserProfile() {
         },
         body: JSON.stringify(updatedUserInfo),
       });
-
+  
       if (response.ok) {
         const updatedUserData = await response.json();
         if (updatedUserData && updatedUserData.user) {
           setEditMode(false);
-          setUser(updatedUserData.user);
+  
+          // Preserve the RecentOrders in the updated user data
+          setUser({
+            ...updatedUserData.user,
+            RecentOrders: user.RecentOrders, // Keep the existing RecentOrders
+          });
         } else {
           console.error('Failed to get updated user data');
         }
@@ -101,6 +106,7 @@ function UserProfile() {
       console.error('Error updating user information:', error);
     }
   };
+  
 
   const handleDeleteAccount = () => {
     toast.info('Are you sure you want to delete your account? This action cannot be undone.', {
@@ -234,7 +240,7 @@ function UserProfile() {
                       {order.image ? (
                         <img src={order.image} className="card-img" alt="Product" />
                       ) : (
-                        <p>No Image Available</p>
+                        <p>No Imge Available</p>
                       )}
                     </div>
                     <div className="col-md-8">
