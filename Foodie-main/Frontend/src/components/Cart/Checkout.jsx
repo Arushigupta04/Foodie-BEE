@@ -2,11 +2,16 @@ import React, { useState } from 'react';
 
 const Checkout = ({ totalAmount, handlePayment }) => {
   const [address, setAddress] = useState('');
+  const [email, setEmail] = useState(''); // New state for email
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [loading, setLoading] = useState(false);
 
   const handleAddressChange = (e) => {
     setAddress(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
   };
 
   const handlePaymentMethodChange = (e) => {
@@ -15,15 +20,15 @@ const Checkout = ({ totalAmount, handlePayment }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (address.trim() === '') {
-      alert('Please enter your delivery address.');
+    if (address.trim() === '' || email.trim() === '') {
+      alert('Please enter your delivery address and email.');
       return;
     }
 
     setLoading(true);
 
     try {
-      await handlePayment({ address, paymentMethod });
+      await handlePayment({ address, paymentMethod, email }); // Pass email to handlePayment
     } catch (error) {
       console.error('Error processing payment:', error);
       alert('Failed to process payment. Please try again later.');
@@ -52,6 +57,18 @@ const Checkout = ({ totalAmount, handlePayment }) => {
             ></textarea>
           </div>
           <div className="mb-3">
+            <label htmlFor="email" className="form-label">Email</label>
+            <input
+              type="email"
+              className="form-control"
+              id="email"
+              value={email}
+              onChange={handleEmailChange}
+              placeholder="Enter your email..."
+              required
+            />
+          </div>
+          <div className="mb-3">
             <label htmlFor="paymentMethod" className="form-label">Payment Method</label>
             <select
               className="form-select"
@@ -67,7 +84,7 @@ const Checkout = ({ totalAmount, handlePayment }) => {
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={loading} // Disable button when loading
+            disabled={loading}
           >
             {loading ? 'Processing...' : 'Place Order'}
           </button>
