@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./style.css";
 
 import AboutPage from "../../assets/category-images/about.gif";
-import AboutPage2 from "../../assets/category-images/aboutPage2.gif";
+//import AboutPage2 from "../../assets/category-images/aboutPage2.gif";
 import FreshDishesIcon from '../../assets/category-images/fresh-dishes-icon.jpg';
 import VariousMenuIcon from '../../assets/category-images/various-menu-icon.jpg';
 import WellServiceIcon from '../../assets/category-images/well-service-icon.jpg';
