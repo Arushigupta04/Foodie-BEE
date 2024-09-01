@@ -19,6 +19,8 @@ const transporter = nodemailer.createTransport({
 });
 
 
+
+
 const sendEmail = async (to, subject, text, html) => {
   try {
     await transporter.sendMail({
@@ -116,7 +118,7 @@ router.post("/user/delete", async (req, res) => {
 router.post("/user/add-order", async (req, res) => {
   console.log("Add Order Request Received");
 
-  const { name, price, delivery_address, quantity, image, payment_method } = req.body;
+  const { name, price, delivery_address, quantity, image, payment_method, email } = req.body;
 
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -146,12 +148,20 @@ router.post("/user/add-order", async (req, res) => {
     user.RecentOrders.push(order._id);
     await user.save();
 
+    // Send confirmation email
+    const subject = 'Order Confirmation';
+    const text = `Hi ${user.fullName},\n\nYour order has been placed successfully. Your order details are as follows:\n\nName: ${name}\nPrice: ₹${price}\nDelivery Address: ${delivery_address}\nQuantity: ${quantity}\nPayment Method: ${payment_method}\n\nThank you for shopping with us!`;
+    const html = `<p>Hi ${user.fullName},</p><p>Your order has been placed successfully. Your order details are as follows:</p><ul><li>Name: ${name}</li><li>Price: ₹${price}</li><li>Delivery Address: ${delivery_address}</li><li>Quantity: ${quantity}</li><li>Payment Method: ${payment_method}</li></ul><p>Thank you for shopping with us!</p>`;
+
+    await sendEmail(email, subject, text, html);
+
     return res.status(201).json({ message: "Order added successfully", order });
   } catch (err) {
     console.error("Error adding order:", err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 router.post('/user/update', async (req, res) => {
   console.log("User Update Req Received");
