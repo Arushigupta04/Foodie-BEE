@@ -20,7 +20,8 @@ const ShoppingCart = () => {
     setShowCheckout(true);
   };
 
-  const handlePayment = async ({ address, paymentMethod }) => {
+
+  const handlePayment = async ({ address, paymentMethod, email }) => { // Include email in the parameters
     const orderData = cartItems.map((item) => ({
       name: item.item_title,
       price: item.item_price,
@@ -28,6 +29,7 @@ const ShoppingCart = () => {
       quantity: item.quantity,
       image: item.item_src,
       payment_method: paymentMethod, 
+      email: email, // Add email to the order data
     }));
   
     try {
